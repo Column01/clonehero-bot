@@ -1,1 +1,3 @@
 ﻿chBot
+*.txt
+!requirements.txt

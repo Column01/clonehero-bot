@@ -5,9 +5,10 @@ from PIL import Image
 
 # GREEN NOTE: 07790a, (7, 121, 10)
 # RED NOTE: 7c0407, (124, 4, 7)
-# YELLOW NOTE: 796300, (121, 99, 0)
-# BLUE NOTE: 003476, (0, 52, 118)
-# ORANGE NOTE: 773a00, (119, 58, 0)
+# YELLOW NOTE: CFCD36, (207, 205, 54)
+# BLUE NOTE: 51a5d4, (81, 165, 212)
+# ORANGE NOTE: cd9a18, (205, 154, 24)
+# STARPOWER NOTE: 40cac7 (64, 202, 199)
 # OPEN NOTE: 77179f, (119, 23, 159)
 
 # End value is FPS value
@@ -18,10 +19,11 @@ TOLERANCE = 5
 _notes = {
     "GREEN": (7, 121, 10),
     "RED": (124, 4, 7),
-    "YELLOW": (121, 99, 0),
-    "BLUE": (0, 52, 118),
-    "ORANGE": (119, 58, 0),
+    "YELLOW": (207, 205, 54),
+    "BLUE": (81, 165, 212),
+    "ORANGE": (205, 154, 24),
     "OPEN": (119, 23, 159),
+    "STARPOWER": (64, 202, 199)
 }
 
 MASKS = {"indexes": {}}
@@ -65,7 +67,13 @@ frame_times = []
 
 camera = cv2.VideoCapture(0)
 
-ret, frame = camera.read() if camera.isOpened() else False, False 
+ret, frame = camera.read() if camera.isOpened() else False, False
+
+
+note_file = open("notes.txt", "w+")
+
+# Macro for fast file write
+write_notes = note_file.write
 
 if ret:
     camera.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
@@ -103,31 +111,55 @@ if ret:
             cur_note = MASKS["indexes"].get(i)
             mask = cv2.inRange(chunk, MASKS[cur_note]["lower"], MASKS[cur_note]["upper"])
             cropped_mask_y, cropped_mask_x = np.nonzero(mask)
-            
+            # No detection.
             if cropped_mask_y.shape[0] == 0 or cropped_mask_x[0] == 0:
+                # # Try SP mask:
+                # sp_mask = cv2.inRange(chunk, MASKS["STARPOWER"]["lower"], MASKS["STARPOWER"]["upper"])
+                # cropped_spmask_y, cropped_spmask_x = np.nonzero(sp_mask)
+                # # No detection
+                # if cropped_spmask_y.shape[0] == 0 or cropped_spmask_x[0] == 0:
+                #     detected.append("[ ]")
+                # # Starpower detection, save it.
+                # else:
+                #     has_detection = True
+                #     detected.append(f"[SP_{cur_note}]")
                 detected.append("[ ]")
             # We have a detection, save it
             else:
                 has_detection = True
                 detected.append(f"[{cur_note}]")
                 
-        # No detections this tick, try detecting open notes
+        # # No detections this tick, try detecting open notes
         if not has_detection:
             open_mask = cv2.inRange(cropped, MASKS["OPEN"]["lower"], MASKS["OPEN"]["upper"])
             cropped_mask_y, cropped_mask_x = np.nonzero(open_mask)
+            # No detection
             if cropped_mask_y.shape[0] == 0 or cropped_mask_x[0] == 0:
+                # # Try SP mask:
+                # sp_mask = cv2.inRange(chunk, MASKS["STARPOWER"]["lower"], MASKS["STARPOWER"]["upper"])
+                # cropped_spmask_y, cropped_spmask_x = np.nonzero(sp_mask)
+                # # No detection
+                # if cropped_spmask_y.shape[0] == 0 or cropped_spmask_x[0] == 0:
+                #     detected.append("[ ]")
+                # # Starpower detection, save it.
+                # else:
+                #     has_detection = True
+                #     detected.append(f"[SP_OPEN]")
                 detected.append("[ ]")
             # We have a detection, save it
             else:
                 has_detection = True
                 detected.append("[OPEN]")
                 
-        # Print the detected list every 15 iterations for logging purposes
-        if cur_it == 15:
+        # Print the detected list every 30 iterations for debuging purposes
+        if cur_it == 30:
             print(", ".join(detected))
             cur_it = 0
         else:
             cur_it += 1
+
+        write_notes(", ".join(detected))
+        write_notes("\n")
 
         # Calculate the used time and wait for whatever is left for a 60fps loop
         end = time.time()
@@ -140,3 +172,4 @@ if ret:
             break
 
 camera.release()
+note_file.close()
