@@ -114,16 +114,15 @@ if ret:
             # No detection.
             if cropped_mask_y.shape[0] == 0 or cropped_mask_x[0] == 0:
                 # # Try SP mask:
-                # sp_mask = cv2.inRange(chunk, MASKS["STARPOWER"]["lower"], MASKS["STARPOWER"]["upper"])
-                # cropped_spmask_y, cropped_spmask_x = np.nonzero(sp_mask)
-                # # No detection
-                # if cropped_spmask_y.shape[0] == 0 or cropped_spmask_x[0] == 0:
-                #     detected.append("[ ]")
-                # # Starpower detection, save it.
-                # else:
-                #     has_detection = True
-                #     detected.append(f"[SP_{cur_note}]")
-                detected.append("[ ]")
+                sp_mask = cv2.inRange(chunk, MASKS["STARPOWER"]["lower"], MASKS["STARPOWER"]["upper"])
+                cropped_spmask_y, cropped_spmask_x = np.nonzero(sp_mask)
+                # No detection
+                if cropped_spmask_y.shape[0] == 0 or cropped_spmask_x[0] == 0:
+                    detected.append("[ ]")
+                # Starpower detection, save it.
+                else:
+                    has_detection = True
+                    detected.append(f"[SP_{cur_note}]")
             # We have a detection, save it
             else:
                 has_detection = True
@@ -136,16 +135,15 @@ if ret:
             # No detection
             if cropped_mask_y.shape[0] == 0 or cropped_mask_x[0] == 0:
                 # # Try SP mask:
-                # sp_mask = cv2.inRange(chunk, MASKS["STARPOWER"]["lower"], MASKS["STARPOWER"]["upper"])
-                # cropped_spmask_y, cropped_spmask_x = np.nonzero(sp_mask)
-                # # No detection
-                # if cropped_spmask_y.shape[0] == 0 or cropped_spmask_x[0] == 0:
-                #     detected.append("[ ]")
-                # # Starpower detection, save it.
-                # else:
-                #     has_detection = True
-                #     detected.append(f"[SP_OPEN]")
-                detected.append("[ ]")
+                sp_mask = cv2.inRange(chunk, MASKS["STARPOWER"]["lower"], MASKS["STARPOWER"]["upper"])
+                cropped_spmask_y, cropped_spmask_x = np.nonzero(sp_mask)
+                # No detection
+                if cropped_spmask_y.shape[0] == 0 or cropped_spmask_x[0] == 0:
+                    detected.append("[ ]")
+                # Starpower detection, save it.
+                else:
+                    has_detection = True
+                    detected.append(f"[SP_OPEN]")
             # We have a detection, save it
             else:
                 has_detection = True
