@@ -9,7 +9,7 @@ from PIL import Image
 # BLUE NOTE: 51a5d4, (81, 165, 212)
 # ORANGE NOTE: cd9a18, (205, 154, 24)
 # STARPOWER NOTE: 40cac7 (64, 202, 199)
-# OPEN NOTE: 77179f, (119, 23, 159)
+# OPEN NOTE: 6e1191, (110, 17, 145)
 
 # End value is FPS value
 MAX_FRAME_TIME = 1000 // 60
@@ -22,7 +22,7 @@ _notes = {
     "YELLOW": (207, 205, 54),
     "BLUE": (81, 165, 212),
     "ORANGE": (205, 154, 24),
-    "OPEN": (119, 23, 159),
+    "OPEN": (110, 17, 145),
     "STARPOWER": (64, 202, 199)
 }
 
