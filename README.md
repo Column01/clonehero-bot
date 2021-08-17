@@ -2,11 +2,12 @@
 
 A bot using Python and OpenCV to detect notes from clone hero and play the game for you.
 
+Note: This is a WIP, current performance over-strums alot but [can get 97% on TTFATF](https://www.youtube.com/watch?v=OMDZghlFQJY)
+
 ## Installing
 
 - Install Python 3.8 or newer
 - Install requirements: `python -m pip install -r requirements.txt`
-- Run with `python ch_bot.py`
 
 ## Configuring OBS
 
@@ -23,11 +24,12 @@ Now to configure OBS scenes.
 
 It should now update in the preview to only see a small portion of the highway. No star power bar or fail bar or the note "plungers" at the bottom of the highway.
 
-Now that you have the note cutout setup, you need to ensure that the hit window is set properly to allow the bot to hit notes inside it.
+Now that you have the note cutout setup, you should be able to test the bot.
 
-- Enable the setting "Show Hit Window"
-- Start a song and subtract 10ms from your current Video calibration offset (should be negative) until the hit window fills your cutout space.
-- Write down your old value somewhere in case you want to play normally, its usually 0ms anyways.
+## Running the bot
 
-A value of -50 worked for me.  
-The bot uses this hit window configuration to ensure that it doesn't have interference from the "plungers" in the note finding process.
+First you will need to ensure you have clone hero running. Once you do, start OBS and start the virtual cam (covered in the section above, do not use the included virtual camera!)
+
+Once you have that done, you may need to run the code a few times changing the line that has `camera = cv2.VideoCapture(0)` and change the `0` to whatever camera number your obs virtual camera is.
+
+To test the bot, start a song, pause it and then run the bot in a command line using `python ch_bot.py`. This will start printing some empty boxes to the screen occasionally, this is to test that it's detecting things. Unpause the game and see if the bot starts to recognize notes and playing poorly (overstrummign alot)
