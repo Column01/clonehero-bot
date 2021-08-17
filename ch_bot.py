@@ -1,6 +1,8 @@
+import time
+
 import cv2
 import numpy as np
-import time
+import keyboard
 from PIL import Image
 
 # GREEN NOTE: 07790a, (7, 121, 10)
@@ -14,9 +16,15 @@ from PIL import Image
 # End value is FPS value
 MAX_FRAME_TIME = 1000 // 60
 
+# Number of frames to wait before strumming. Adjust if the bot is strumming too much or not fast enough.
+FRAMES_TILL_STRUM = 2
+
+# Whether to write detections to a text file
+SAVE_TO_FILE = True
+
 TOLERANCE = 5
 
-_notes = {
+_NOTES = {
     "GREEN": (7, 121, 10),
     "RED": (124, 4, 7),
     "YELLOW": (207, 205, 54),
@@ -26,10 +34,20 @@ _notes = {
     "STARPOWER": (64, 202, 199)
 }
 
+NOTE_MAPPING = {
+    "GREEN": "~",
+    "RED": "1",
+    "YELLOW": "2",
+    "BLUE": "3",
+    "ORANGE": "4"
+}
+
+STRUM = "up"
+
 MASKS = {"indexes": {}}
 
 i = 0
-for note, color in _notes.items():
+for note, color in _NOTES.items():
     MASKS["indexes"][i] = note
     i += 1
 
@@ -62,26 +80,46 @@ def crop(image):
         return None
     return image[np.min(y_nonzero):np.max(y_nonzero), np.min(x_nonzero):np.max(x_nonzero)]
 
-
 frame_times = []
 
 camera = cv2.VideoCapture(0)
 
 ret, frame = camera.read() if camera.isOpened() else False, False
 
+if SAVE_TO_FILE:
+    note_file = open("notes.txt", "w+")
 
-note_file = open("notes.txt", "w+")
+    # Macro for fast file write
+    write_notes = note_file.write
 
-# Macro for fast file write
-write_notes = note_file.write
+# Macro for send key
+press_key = keyboard.press
+# Macro for release key
+release_key = keyboard.release
+# Macro for press and release
+press_and_release = keyboard.press_and_release
+# Macro for is_pressed
+is_pressed = keyboard.is_pressed
+
+print(MAX_FRAME_TIME * FRAMES_TILL_STRUM)
+
+
+def strum():
+    """ Blocking call to strum FRAMES_TILL_STRUM frames later """
+    print("STRUM")
+    time.sleep((MAX_FRAME_TIME * FRAMES_TILL_STRUM) / 1000)
+    press_and_release(STRUM)
 
 if ret:
     camera.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
     camera.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
 
     cur_it = 0
+    last_strum = 0
 
     while True:
+        to_press = []
+        to_depress = []
         # Current time in MS
         start = time.time()
         # Capture the video frame
@@ -100,7 +138,8 @@ if ret:
         # Split cropped image into 5 equal columns. See: https://stackoverflow.com/questions/56896878/split-image-into-arbitrary-number-of-boxes
         h, w = cropped.shape[:2]
         chunks = 5
-        detected = []
+        if SAVE_TO_FILE:
+            detected = []
         # Variable so we can process open notes properly
         has_detection = False
         for i in range(chunks):
@@ -109,55 +148,76 @@ if ret:
 
             # Create a color mask for the current note and check for detections
             cur_note = MASKS["indexes"].get(i)
+            # Get the key for the current note
+            key = NOTE_MAPPING.get(cur_note)
+
             mask = cv2.inRange(chunk, MASKS[cur_note]["lower"], MASKS[cur_note]["upper"])
             cropped_mask_y, cropped_mask_x = np.nonzero(mask)
+
             # No detection.
             if cropped_mask_y.shape[0] == 0 or cropped_mask_x[0] == 0:
-                # # Try SP mask:
+                # Try SP mask:
                 sp_mask = cv2.inRange(chunk, MASKS["STARPOWER"]["lower"], MASKS["STARPOWER"]["upper"])
                 cropped_spmask_y, cropped_spmask_x = np.nonzero(sp_mask)
                 # No detection
                 if cropped_spmask_y.shape[0] == 0 or cropped_spmask_x[0] == 0:
-                    detected.append("[ ]")
+                    if SAVE_TO_FILE: detected.append("[ ]")
+
+                    to_depress.append(key)
                 # Starpower detection, save it.
                 else:
                     has_detection = True
-                    detected.append(f"[SP_{cur_note}]")
+                    if SAVE_TO_FILE: detected.append(f"[SP_{cur_note}]")
+
+                    # Press the key if its not pressed
+                    to_press.append(key)
             # We have a detection, save it
             else:
                 has_detection = True
-                detected.append(f"[{cur_note}]")
-                
-        # # No detections this tick, try detecting open notes
+                if SAVE_TO_FILE: detected.append(f"[{cur_note}]")
+            
+                # Press the key if its not pressed
+                to_press.append(key)
+
+        # No detections this tick, try detecting open notes
         if not has_detection:
             open_mask = cv2.inRange(cropped, MASKS["OPEN"]["lower"], MASKS["OPEN"]["upper"])
             cropped_mask_y, cropped_mask_x = np.nonzero(open_mask)
             # No detection
             if cropped_mask_y.shape[0] == 0 or cropped_mask_x[0] == 0:
-                # # Try SP mask:
+                # Try SP mask:
                 sp_mask = cv2.inRange(chunk, MASKS["STARPOWER"]["lower"], MASKS["STARPOWER"]["upper"])
                 cropped_spmask_y, cropped_spmask_x = np.nonzero(sp_mask)
                 # No detection
                 if cropped_spmask_y.shape[0] == 0 or cropped_spmask_x[0] == 0:
-                    detected.append("[ ]")
+                    if SAVE_TO_FILE: detected.append("[ ]")
                 # Starpower detection, save it.
                 else:
                     has_detection = True
-                    detected.append(f"[SP_OPEN]")
-            # We have a detection, save it
+                    if SAVE_TO_FILE: detected.append(f"[SP_OPEN]")
+
+            # We have a detection, save it.
             else:
                 has_detection = True
-                detected.append("[OPEN]")
-                
-        # Print the detected list every 30 iterations for debuging purposes
-        if cur_it == 30:
-            print(", ".join(detected))
-            cur_it = 0
-        else:
-            cur_it += 1
+                if SAVE_TO_FILE: detected.append("[OPEN]")
 
-        write_notes(", ".join(detected))
-        write_notes("\n")
+        # We have a detection, all keys should be pressed/release and then we can strum.
+        if has_detection:
+            for key in to_depress:
+                release_key(key)
+            for key in to_press:
+                press_key(key)
+            strum()
+
+        if SAVE_TO_FILE:
+            # Print the detected list every 30 iterations for debuging purposes
+            if cur_it == 30:
+                print(", ".join(detected))
+                cur_it = 0
+            else:
+                cur_it += 1
+            # write_notes(", ".join(detected))
+            # write_notes("\n")
 
         # Calculate the used time and wait for whatever is left for a 60fps loop
         end = time.time()
@@ -166,8 +226,11 @@ if ret:
         # If we took more than the time required for 60fps, only wait 1ms
         wait_time = MAX_FRAME_TIME - frame_time if MAX_FRAME_TIME - frame_time > 0 else 1
 
+        # Wait for calculated frame time delay
         if cv2.waitKey(wait_time) & 0xFF == ord('q'):
             break
 
 camera.release()
-note_file.close()
+
+if SAVE_TO_FILE:
+    note_file.close()
