@@ -17,7 +17,7 @@ from PIL import Image
 MAX_FRAME_TIME = 1000 // 60
 
 # Number of frames to wait before strumming. Adjust if the bot is strumming too much or not fast enough.
-FRAMES_TILL_STRUM = 2
+FRAMES_TILL_STRUM = 1
 
 # Whether to write detections to a text file
 SAVE_TO_FILE = True
@@ -100,15 +100,6 @@ release_key = keyboard.release
 press_and_release = keyboard.press_and_release
 # Macro for is_pressed
 is_pressed = keyboard.is_pressed
-
-print(MAX_FRAME_TIME * FRAMES_TILL_STRUM)
-
-
-def strum():
-    """ Blocking call to strum FRAMES_TILL_STRUM frames later """
-    print("STRUM")
-    time.sleep((MAX_FRAME_TIME * FRAMES_TILL_STRUM) / 1000)
-    press_and_release(STRUM)
 
 if ret:
     camera.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
@@ -207,7 +198,8 @@ if ret:
                 release_key(key)
             for key in to_press:
                 press_key(key)
-            strum()
+            time.sleep((MAX_FRAME_TIME * FRAMES_TILL_STRUM) / 1000)
+            press_and_release(STRUM)
 
         if SAVE_TO_FILE:
             # Print the detected list every 30 iterations for debuging purposes
