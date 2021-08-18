@@ -34,8 +34,8 @@ MAX_FRAME_TIME = 1000 // 60
 # Number of frames to wait before strumming. Default: 1
 FRAMES_TILL_STRUM = 1
 
-# Whether to save detected notes for printing. Default: True
-SAVE_NOTES = True
+# Whether to save detected notes and print them out every so often. Default: False
+SAVE_NOTES = False
 
 # Whether to write detections to a text file. Default: False
 SAVE_NOTES_TO_FILE = False

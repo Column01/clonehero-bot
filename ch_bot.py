@@ -14,8 +14,6 @@ def crop(image):
         return None
     return image[np.min(y_nonzero):np.max(y_nonzero), np.min(x_nonzero):np.max(x_nonzero)]
 
-frame_times = []
-
 camera = cv2.VideoCapture(0)
 
 ret, frame = camera.read() if camera.isOpened() else False, False
@@ -36,17 +34,20 @@ press_and_release = keyboard.press_and_release
 is_pressed = keyboard.is_pressed
 
 if ret:
-    camera.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
-    camera.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
+    print("Starting note detection")
 
     cur_it = 0
-    last_strum = 0
 
     while True:
-        to_press = []
-        to_depress = []
         # Current time in MS
         start = time.time()
+
+        to_press = []
+        to_depress = []
+        has_detection = False
+        if SAVE_NOTES or SAVE_NOTES_TO_FILE:
+            detected = []
+
         # Capture the video frame
         ret, frame = camera.read()
 
@@ -62,14 +63,11 @@ if ret:
 
         # Split cropped image into 5 equal columns. See: https://stackoverflow.com/questions/56896878/split-image-into-arbitrary-number-of-boxes
         h, w = cropped.shape[:2]
-        chunks = 5
-        if SAVE_NOTES or SAVE_NOTES_TO_FILE:
-            detected = []
-        # Variable so we can process open notes properly
-        has_detection = False
-        for i in range(chunks):
+        notes = 5
+        
+        for i in range(notes):
             # The current chunk to process
-            chunk = cropped[:, i * w // chunks: (i + 1) * w // chunks]
+            chunk = cropped[:, i * w // notes: (i + 1) * w // notes]
 
             # Create a color mask for the current note and check for detections
             cur_note = MASKS["indexes"].get(i)
@@ -111,7 +109,7 @@ if ret:
             # No detection
             if cropped_mask_y.shape[0] == 0 or cropped_mask_x[0] == 0:
                 # Try SP mask:
-                sp_mask = cv2.inRange(chunk, MASKS["STARPOWER"]["lower"], MASKS["STARPOWER"]["upper"])
+                sp_mask = cv2.inRange(cropped, MASKS["STARPOWER"]["lower"], MASKS["STARPOWER"]["upper"])
                 cropped_spmask_y, cropped_spmask_x = np.nonzero(sp_mask)
                 # No detection
                 if cropped_spmask_y.shape[0] == 0 or cropped_spmask_x[0] == 0:
@@ -143,13 +141,12 @@ if ret:
             else:
                 cur_it += 1
 
-        if SAVE_NOTES_TO_FILE:
-            write_notes(", ".join(detected))
-            write_notes("\n")
-
         # Calculate the used time and wait for whatever is left for a 60fps loop
         end = time.time()
         frame_time = int((end - start) * 1000)
+
+        if SAVE_NOTES_TO_FILE:
+            write_notes(f"{frame_time}, {', '.join(detected)}\n")
 
         # If we took more than the time required for 60fps, only wait 1ms
         wait_time = MAX_FRAME_TIME - frame_time
