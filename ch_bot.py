@@ -3,7 +3,6 @@ import time
 import cv2
 import numpy as np
 import keyboard
-# from PIL import Image
 
 from config import *
 
@@ -59,7 +58,10 @@ if ret:
 
         if cropped is None:
             continue
-        cropped = cv2.cvtColor(cropped, cv2.COLOR_BGR2HSV)
+        # cropped = cv2.cvtColor(cropped, cv2.COLOR_BGR2HSV)
+
+        if SHOW_OUTPUT:
+            cv2.imshow("Cropped Image", cropped)
 
         # Split cropped image into 5 equal columns. See: https://stackoverflow.com/questions/56896878/split-image-into-arbitrary-number-of-boxes
         h, w = cropped.shape[:2]
@@ -130,7 +132,7 @@ if ret:
                 release_key(key)
             for key in to_press:
                 press_key(key)
-            time.sleep((MAX_FRAME_TIME * FRAMES_TILL_STRUM) / 1000)
+            time.sleep(WAIT_FOR_STRUM)
             press_and_release(STRUM)
 
         if SAVE_NOTES:
@@ -157,6 +159,9 @@ if ret:
             break
 
 camera.release()
+
+if SHOW_OUTPUT:
+    cv2.destroyAllWindows()
 
 if SAVE_NOTES_TO_FILE:
     note_file.close()
