@@ -2,7 +2,7 @@
 
 A bot using Python and OpenCV to detect notes from clone hero and play the game for you.
 
-Note: This is a WIP, current performance over-strums alot but [can get 97% on TTFATF](https://www.youtube.com/watch?v=OMDZghlFQJY)
+Note: This is a WIP, current performance over-strums alot but [can get 99% on TTFATF](https://youtu.be/UjaKSFdEPBg)
 
 ## Installing
 
