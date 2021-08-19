@@ -132,7 +132,7 @@ if ret:
                 release_key(key)
             for key in to_press:
                 press_key(key)
-            time.sleep(WAIT_FOR_STRUM)
+            # time.sleep(WAIT_FOR_STRUM)
             press_and_release(STRUM)
 
         if SAVE_NOTES:
