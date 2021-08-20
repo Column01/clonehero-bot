@@ -33,3 +33,15 @@ First you will need to ensure you have clone hero running. Once you do, start OB
 Once you have that done, you may need to run the code a few times changing the line that has `camera = cv2.VideoCapture(0)` and change the `0` to whatever camera number your obs virtual camera is.
 
 To test the bot, start a song, pause it and then run the bot in a command line using `python ch_bot.py`. This will start printing some empty boxes to the screen occasionally, this is to test that it's detecting things. Unpause the game and see if the bot starts to recognize notes and playing poorly (overstrummign alot)
+
+### Highest score
+
+I turned on the All Taps mode and used the feature in the bot that does the same. Playing TTFATF on Expert, here is the result:
+
+![ttfatf-expert-all-taps](https://i.imgur.com/bKtTbGk.png)
+
+### Highest notes hit
+
+Just using the normal bot on TTFATF Expert, here is the highest number of notes I was able to hit:
+
+![ttfatf-expert-normal](https://i.imgur.com/nN4De96.png)
