@@ -21,8 +21,7 @@ NOTES = {
     "YELLOW": (220, 228, 228),
     "BLUE": (220, 228, 228),
     "ORANGE": (220, 228, 228),
-    "OPEN": (110, 17, 145),
-    "STARPOWER": (85, 249, 245)
+    "OPEN": (110, 17, 145)
 }
 
 # Sets the FPS value (end number) Default: 60

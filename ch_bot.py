@@ -81,21 +81,8 @@ if ret:
 
             # No detection.
             if cropped_mask_y.shape[0] == 0 or cropped_mask_x[0] == 0:
-                # Try SP mask:
-                sp_mask = cv2.inRange(chunk, MASKS["STARPOWER"]["lower"], MASKS["STARPOWER"]["upper"])
-                cropped_spmask_y, cropped_spmask_x = np.nonzero(sp_mask)
-                # No detection
-                if cropped_spmask_y.shape[0] == 0 or cropped_spmask_x[0] == 0:
-                    if SAVE_NOTES or SAVE_NOTES_TO_FILE: detected.append("[ ]")
-
-                    to_depress.append(key)
-                # Starpower detection, save it.
-                else:
-                    has_detection = True
-                    if SAVE_NOTES or SAVE_NOTES_TO_FILE: detected.append(f"[SP_{cur_note}]")
-
-                    # Press the key if its not pressed
-                    to_press.append(key)
+                if SAVE_NOTES or SAVE_NOTES_TO_FILE: detected.append("[ ]")
+                to_depress.append(key)
             # We have a detection, save it
             else:
                 has_detection = True
@@ -110,17 +97,7 @@ if ret:
             cropped_mask_y, cropped_mask_x = np.nonzero(open_mask)
             # No detection
             if cropped_mask_y.shape[0] == 0 or cropped_mask_x[0] == 0:
-                # Try SP mask:
-                sp_mask = cv2.inRange(cropped, MASKS["STARPOWER"]["lower"], MASKS["STARPOWER"]["upper"])
-                cropped_spmask_y, cropped_spmask_x = np.nonzero(sp_mask)
-                # No detection
-                if cropped_spmask_y.shape[0] == 0 or cropped_spmask_x[0] == 0:
-                    if SAVE_NOTES or SAVE_NOTES_TO_FILE: detected.append("[ ]")
-                # Starpower detection, save it.
-                else:
-                    has_detection = True
-                    if SAVE_NOTES or SAVE_NOTES_TO_FILE: detected.append(f"[SP_OPEN]")
-
+                if SAVE_NOTES or SAVE_NOTES_TO_FILE: detected.append("[ ]")
             # We have a detection, save it.
             else:
                 has_detection = True
