@@ -66,6 +66,10 @@ if ret:
         if SHOW_OUTPUT:
             cv2.imshow("Cropped Image", cropped)
 
+        if TAPS_MODE:
+            for key in NOTE_MAPPING.values():
+                keyboard.release(key)
+
         # Split cropped image into 5 equal columns. See: https://stackoverflow.com/questions/56896878/split-image-into-arbitrary-number-of-boxes
         h, w = cropped.shape[:2]
         notes = 5
@@ -112,8 +116,9 @@ if ret:
                 release_key(key)
             for key in to_press:
                 press_key(key)
-            # time.sleep(WAIT_FOR_STRUM)
-            press_and_release(STRUM)
+            if not TAPS_MODE:
+                # time.sleep(WAIT_FOR_STRUM)
+                press_and_release(STRUM)
 
         if SAVE_NOTES:
             # Print the detected list every 30 iterations for debuging purposes

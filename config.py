@@ -27,8 +27,11 @@ NOTES = {
     "OPEN": (110, 17, 145)
 }
 
-# Sets the FPS value (end number) Default: 60
-MAX_FRAME_TIME = 1000 // 60
+# Disables strumming and clears pressed keys each detection run. Sacrifices accuracy for score. Used for all taps mode
+TAPS_MODE = True
+
+# Sets the FPS value (end number) Default: 120
+MAX_FRAME_TIME = 1000 // 120
 
 # Shows the cropped output that the bot sees in a new window
 SHOW_OUTPUT = False
