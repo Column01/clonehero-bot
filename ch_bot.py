@@ -33,10 +33,14 @@ press_and_release = keyboard.press_and_release
 is_pressed = keyboard.is_pressed
 
 if ret:
-    print("Starting note detection")
-
     cur_it = 0
+    
+    print("Sending some dummy keystrokes to prepare the bot for use")
+    # Press all keys to just warm up the bot
+    for key in NOTE_MAPPING.values():
+        keyboard.press_and_release(key)
 
+    print("Starting note detection")
     while True:
         # Current time in MS
         start = time.time()
@@ -58,7 +62,6 @@ if ret:
 
         if cropped is None:
             continue
-        # cropped = cv2.cvtColor(cropped, cv2.COLOR_BGR2HSV)
 
         if SHOW_OUTPUT:
             cv2.imshow("Cropped Image", cropped)
