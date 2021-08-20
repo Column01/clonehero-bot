@@ -2,6 +2,9 @@
 Configuration file for configuring the bot
 """
 
+# The device number for the camera that OBSVirtualCam is using
+VIDEO_DEVICE_NUM = 0
+
 # Default values I was able to get working for colors, these tend to be worse than detecting the tops of the notes as is set below.
 # GREEN NOTE: 07790a, (7, 121, 10)
 # RED NOTE: 7c0407, (124, 4, 7)

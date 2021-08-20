@@ -13,7 +13,7 @@ def crop(image):
         return None
     return image[np.min(y_nonzero):np.max(y_nonzero), np.min(x_nonzero):np.max(x_nonzero)]
 
-camera = cv2.VideoCapture(0)
+camera = cv2.VideoCapture(VIDEO_DEVICE_NUM)
 
 ret, frame = camera.read() if camera.isOpened() else False, False
 
